@@ -42,6 +42,7 @@ class ContractAnalysisPipeline:
         self,
         model_name: str = "gpt-4o",
         temperature: float = 0.0,
+        api_key: str | None = None,
     ) -> None:
         """
         Inicializa el pipeline instanciando ambos agentes con los mismos parámetros.
@@ -51,14 +52,18 @@ class ContractAnalysisPipeline:
                         (default: "gpt-4o").
             temperature: Temperatura de sampleo para ambos agentes. 0.0 garantiza
                          salidas deterministas, recomendado para análisis legal.
+            api_key: API key de OpenAI. Si se omite, se usa la variable de entorno
+                     OPENAI_API_KEY.
         """
         self._contextualization_agent = ContextualizationAgent(
             model_name=model_name,
             temperature=temperature,
+            api_key=api_key,
         )
         self._extraction_agent = ExtractionAgent(
             model_name=model_name,
             temperature=temperature,
+            api_key=api_key,
         )
 
     def run(

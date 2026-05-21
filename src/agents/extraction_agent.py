@@ -13,7 +13,7 @@ import json
 import re
 
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 SYSTEM_PROMPT = """Eres un Auditor Legal con especialización en análisis de \
@@ -48,20 +48,20 @@ literal exacto de cada cláusula modificada.
 Debes retornar EXACTAMENTE un objeto JSON con la siguiente estructura:
 
 ```json
-{
+{{
   "summary_of_changes": "<string — resumen ejecutivo conciso de todos los cambios detectados>",
   "modified_clauses": [
-    {
+    {{
       "clause_id": "<string — identificador jerárquico de la cláusula, ej: '3.1', '5.2.a'>",
       "clause_title": "<string — título o nombre descriptivo de la cláusula>",
       "original_text": "<string — texto literal de la cláusula en el contrato original; vacío si es nueva>",
       "amended_text": "<string — texto literal de la cláusula en la adenda; vacío si fue eliminada>",
       "change_type": "<'added' | 'modified' | 'removed'>",
       "significance": "<'high' | 'medium' | 'low'>"
-    }
+    }}
   ],
   "risk_assessment": "<string — evaluación profesional de los riesgos legales derivados de los cambios>"
-}
+}}
 ```
 
 ### Reglas de llenado de campos
@@ -120,7 +120,12 @@ class ExtractionAgent:
     Output: dict validable con ContractChangeOutput(**result)
     """
 
-    def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.0) -> None:
+    def __init__(
+        self,
+        model_name: str = "gpt-4o",
+        temperature: float = 0.0,
+        api_key: str | None = None,
+    ) -> None:
         """
         Inicializa el agente con el modelo LangChain especificado.
 
@@ -128,8 +133,13 @@ class ExtractionAgent:
             model_name: Identificador del modelo OpenAI a usar (default: "gpt-4o").
             temperature: Temperatura de sampleo. 0.0 garantiza salidas deterministas,
                          esencial para auditoría legal donde la reproducibilidad importa.
+            api_key: API key de OpenAI. Si se omite, se usa la variable de entorno
+                     OPENAI_API_KEY.
         """
-        self._llm = ChatOpenAI(model=model_name, temperature=temperature)
+        llm_kwargs: dict = {"model": model_name, "temperature": temperature}
+        if api_key is not None:
+            llm_kwargs["api_key"] = api_key
+        self._llm = ChatOpenAI(**llm_kwargs)
 
         self._prompt = ChatPromptTemplate.from_messages(
             [

@@ -8,7 +8,7 @@ ExtractionAgent (Auditor).
 """
 
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 SYSTEM_PROMPT = """Eres un Analista Legal Senior con más de 20 años de experiencia \
@@ -78,7 +78,12 @@ class ContextualizationAgent:
     listo para ser consumido por el ExtractionAgent.
     """
 
-    def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.0) -> None:
+    def __init__(
+        self,
+        model_name: str = "gpt-4o",
+        temperature: float = 0.0,
+        api_key: str | None = None,
+    ) -> None:
         """
         Inicializa el agente con el modelo LangChain especificado.
 
@@ -86,8 +91,13 @@ class ContextualizationAgent:
             model_name: Identificador del modelo OpenAI a usar (default: "gpt-4o").
             temperature: Temperatura de sampleo. 0.0 garantiza salidas deterministas,
                          ideal para análisis legal donde la consistencia es esencial.
+            api_key: API key de OpenAI. Si se omite, se usa la variable de entorno
+                     OPENAI_API_KEY.
         """
-        self._llm = ChatOpenAI(model=model_name, temperature=temperature)
+        llm_kwargs: dict = {"model": model_name, "temperature": temperature}
+        if api_key is not None:
+            llm_kwargs["api_key"] = api_key
+        self._llm = ChatOpenAI(**llm_kwargs)
 
         self._prompt = ChatPromptTemplate.from_messages(
             [
