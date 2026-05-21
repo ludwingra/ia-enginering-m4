@@ -14,7 +14,7 @@
 | WI | Nombre | Estado | Phase |
 |----|--------|--------|-------|
 | WI-01 | Scaffold + Modelos Base | **COMPLETADO** | BUILD (Worktree A) |
-| WI-02 | Agentes LangChain Colaborativos | PENDIENTE | BUILD (Worktree B) |
+| WI-02 | Agentes LangChain Colaborativos | **COMPLETADO** | BUILD (Worktree B) |
 | WI-03 | Observabilidad Langfuse + Pipeline | PENDIENTE | INTEGRATE |
 | WI-04 | Assets + Documentación + Demo | PENDIENTE | BUILD + DOCUMENT |
 
@@ -44,6 +44,14 @@
 - **Branch:** feat/legalmove-contract-analyzer
 - **Commits:** 5d3e561 (scaffold) → 08788be (models) → c92b7db (parser)
 - **Nota:** Se usó fallback nativo (general-purpose) en todos los steps — no hay agente ASD backend-developer registrado
+
+### 2026-05-21 — WI-02: Agentes LangChain Colaborativos — COMPLETADO
+
+- **Step 1/4:** ContextualizationAgent — system prompt "Analista Legal Senior" con 3 fases (estructural, comparativo, priorización) (agente: general-purpose nativo)
+- **Step 2/4:** ExtractionAgent — system prompt "Auditor Legal" con JSON schema embebido, fallback JSON parsing (agente: general-purpose nativo)
+- **Step 3/4:** Pipeline ContractAnalysisPipeline — handoff explícito semantic_map Agent1→Agent2, validación Pydantic (agente: general-purpose nativo)
+- **Step 4/4:** Test E2E — 20/20 tests pasaron. Fixes: import langchain_core, escape braces en template, api_key opcional (agente: general-purpose nativo)
+- **Commits:** b8d2dbe → 1374ecf → 2609122 → 7e9f543
 
 ---
 *Este archivo es la fuente de verdad narrativa. No confundir con claude-progress.json (machine-readable).*
