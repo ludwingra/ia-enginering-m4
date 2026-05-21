@@ -73,6 +73,17 @@ def run_pipeline(
     """
     load_dotenv()
 
+    # Pre-validate image paths before initialising any external clients so that
+    # missing-file errors surface with exit code 1 even when API keys are absent.
+    from pathlib import Path as _Path
+
+    for label, img_path in (("original", original_path), ("amendment", amendment_path)):
+        p = _Path(img_path)
+        if not p.exists():
+            raise FileNotFoundError(f"Image file not found ({label}): {img_path!r}")
+        if not p.is_file():
+            raise FileNotFoundError(f"Path is not a regular file ({label}): {img_path!r}")
+
     # Initialize Langfuse client (reads LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY,
     # and LANGFUSE_HOST from environment automatically)
     langfuse = Langfuse()
