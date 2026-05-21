@@ -4,7 +4,7 @@
 ## Estado Actual
 
 - **Sesión inicializada:** 2026-05-21T22:35:18.766Z
-- **Modo:** PLANNING — plan generado, pendiente aprobación
+- **Modo:** DONE — todos los WIs completados (16/16 steps)
 - **Branch activo:** master (pendiente crear `feat/legalmove-contract-analyzer`)
 - **Work Item activo:** Ninguno (4 WIs planificados)
 - **Plan:** Ver `.claude/memory/PLAN_LEGALMOVE.md`
@@ -16,7 +16,7 @@
 | WI-01 | Scaffold + Modelos Base | **COMPLETADO** | BUILD (Worktree A) |
 | WI-02 | Agentes LangChain Colaborativos | **COMPLETADO** | BUILD (Worktree B) |
 | WI-03 | Observabilidad Langfuse + Pipeline | **COMPLETADO** | INTEGRATE |
-| WI-04 | Assets + Documentación + Demo | PENDIENTE | BUILD + DOCUMENT |
+| WI-04 | Assets + Documentación + Demo | **COMPLETADO** | BUILD + DOCUMENT |
 
 **Estrategia:** `/multi-dispatch-pro` flujo feature (Plan → Build paralelo → Integrate → Verify → Document)
 
@@ -58,6 +58,13 @@
 - **Steps 1-3/4:** main.py con run_pipeline() + Langfuse trace padre + 5 spans jerárquicos + CLI argparse + error handling (agente: general-purpose nativo)
 - **Step 4/4:** Test E2E — 6/6 tests pasaron. Fix: validar paths antes de Langfuse init (agente: general-purpose nativo)
 - **Commits:** 06193e5 → 921b416
+
+### 2026-05-21 — WI-04: Assets + Documentación + Demo — COMPLETADO
+
+- **Step 1/4:** Contratos de prueba — 4 PNGs generados con Pillow + README + script generador (agente: general-purpose nativo)
+- **Step 2/4:** README raíz — 361 líneas, diagrama Mermaid, setup 5 pasos, justificación técnica (agente: general-purpose nativo)
+- **Steps 3-4/4:** Pulido + verificación final — 6/6 checks PASS. Fix: langfuse pin <3.0.0 (agente: general-purpose nativo)
+- **Commits:** bf040cb → 0954543
 
 ---
 *Este archivo es la fuente de verdad narrativa. No confundir con claude-progress.json (machine-readable).*

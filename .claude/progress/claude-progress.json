@@ -4,10 +4,10 @@
   "work_item_type": "feature",
   "hu_id": "HU-LEGALMOVE-001",
   "agent_id": null,
-  "step_current": 12,
+  "step_current": 16,
   "step_total": 16,
-  "step_label": "WI-03 COMPLETADO — Observabilidad Langfuse + Pipeline",
-  "status": "EXECUTING",
+  "step_label": "TODOS LOS WIs COMPLETADOS — Proyecto listo para entrega",
+  "status": "DONE",
   "last_verified_commit": null,
   "rollback_ref": null,
   "artifacts_produced": [
@@ -61,7 +61,7 @@
         "id": "WI-04",
         "name": "Assets + Documentación + Demo",
         "steps": 4,
-        "status": "PENDING",
+        "status": "DONE",
         "phase": "BUILD+DOCUMENT",
         "worktree": "C (step 1)",
         "depends_on": ["WI-03"]
