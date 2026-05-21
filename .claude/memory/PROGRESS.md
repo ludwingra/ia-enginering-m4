@@ -13,7 +13,7 @@
 
 | WI | Nombre | Estado | Phase |
 |----|--------|--------|-------|
-| WI-01 | Scaffold + Modelos Base | PENDIENTE | BUILD (Worktree A) |
+| WI-01 | Scaffold + Modelos Base | **COMPLETADO** | BUILD (Worktree A) |
 | WI-02 | Agentes LangChain Colaborativos | PENDIENTE | BUILD (Worktree B) |
 | WI-03 | Observabilidad Langfuse + Pipeline | PENDIENTE | INTEGRATE |
 | WI-04 | Assets + Documentación + Demo | PENDIENTE | BUILD + DOCUMENT |
@@ -34,7 +34,16 @@
 - Plan estructurado con 4 WIs, 16 steps, estrategia multi-dispatch-pro
 - Stack fijado: Python + OpenAI GPT-4o Vision + LangChain + Pydantic + Langfuse + python-dotenv
 - Plan guardado en `.claude/memory/PLAN_LEGALMOVE.md`
-- Estado: PENDIENTE APROBACION del usuario
+
+### 2026-05-21 — WI-01: Scaffold + Modelos Base — COMPLETADO
+
+- **Step 1/4:** Scaffold proyecto — estructura dirs, requirements.txt, .env.example, .gitignore (agente: general-purpose nativo)
+- **Step 2/4:** Modelo Pydantic ContractChangeOutput + ClauseChange + ContractMetadata + FullAnalysisResult (agente: general-purpose nativo)
+- **Step 3/4:** Image Parser parse_contract_image() con GPT-4o Vision, base64, retry backoff, system prompt jerárquico (agente: general-purpose nativo)
+- **Step 4/4:** Test funcional — 11/11 tests pasaron (6 Pydantic + 5 image_parser validations) (agente: general-purpose nativo)
+- **Branch:** feat/legalmove-contract-analyzer
+- **Commits:** 5d3e561 (scaffold) → 08788be (models) → c92b7db (parser)
+- **Nota:** Se usó fallback nativo (general-purpose) en todos los steps — no hay agente ASD backend-developer registrado
 
 ---
 *Este archivo es la fuente de verdad narrativa. No confundir con claude-progress.json (machine-readable).*
