@@ -15,7 +15,7 @@
 |----|--------|--------|-------|
 | WI-01 | Scaffold + Modelos Base | **COMPLETADO** | BUILD (Worktree A) |
 | WI-02 | Agentes LangChain Colaborativos | **COMPLETADO** | BUILD (Worktree B) |
-| WI-03 | Observabilidad Langfuse + Pipeline | PENDIENTE | INTEGRATE |
+| WI-03 | Observabilidad Langfuse + Pipeline | **COMPLETADO** | INTEGRATE |
 | WI-04 | Assets + Documentación + Demo | PENDIENTE | BUILD + DOCUMENT |
 
 **Estrategia:** `/multi-dispatch-pro` flujo feature (Plan → Build paralelo → Integrate → Verify → Document)
@@ -52,6 +52,12 @@
 - **Step 3/4:** Pipeline ContractAnalysisPipeline — handoff explícito semantic_map Agent1→Agent2, validación Pydantic (agente: general-purpose nativo)
 - **Step 4/4:** Test E2E — 20/20 tests pasaron. Fixes: import langchain_core, escape braces en template, api_key opcional (agente: general-purpose nativo)
 - **Commits:** b8d2dbe → 1374ecf → 2609122 → 7e9f543
+
+### 2026-05-21 — WI-03: Observabilidad Langfuse + Pipeline — COMPLETADO
+
+- **Steps 1-3/4:** main.py con run_pipeline() + Langfuse trace padre + 5 spans jerárquicos + CLI argparse + error handling (agente: general-purpose nativo)
+- **Step 4/4:** Test E2E — 6/6 tests pasaron. Fix: validar paths antes de Langfuse init (agente: general-purpose nativo)
+- **Commits:** 06193e5 → 921b416
 
 ---
 *Este archivo es la fuente de verdad narrativa. No confundir con claude-progress.json (machine-readable).*
