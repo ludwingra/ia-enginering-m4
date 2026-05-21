@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "session_id": "065443ba-7412-4886-ae0a-fff6254cc469",
+  "project_name": "proyecto-m4-ludwing",
+  "runtime": "unknown",
+  "framework": "unknown",
+  "language": "unknown",
+  "package_manager": "npm",
+  "project_type": "new",
+  "created_at": "2026-05-21T22:35:18.770Z",
+  "token_budget_used_pct": 0,
+  "token_budget_layers": {
+    "total_context_window": 200000,
+    "layers": {
+      "system": {
+        "name": "system",
+        "allocated_pct": 15,
+        "allocated_tokens": 30000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "skills": {
+        "name": "skills",
+        "allocated_pct": 15,
+        "allocated_tokens": 30000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "agents": {
+        "name": "agents",
+        "allocated_pct": 10,
+        "allocated_tokens": 20000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "conversation": {
+        "name": "conversation",
+        "allocated_pct": 40,
+        "allocated_tokens": 80000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "tool_results": {
+        "name": "tool_results",
+        "allocated_pct": 20,
+        "allocated_tokens": 40000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      }
+    },
+    "aggregate_used_pct": 0,
+    "aggregate_status": "GREEN",
+    "compact_threshold_pct": 60,
+    "checkpoint_threshold_pct": 85,
+    "strategy": "proactive"
+  },
+  "fallback_tools_available": [],
+  "initialized_at": "2026-05-21T22:38:02Z"
+}

@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0",
+  "work_item_id": "legalmove-contract-analyzer",
+  "work_item_type": "feature",
+  "hu_id": "HU-LEGALMOVE-001",
+  "agent_id": null,
+  "step_current": 0,
+  "step_total": 16,
+  "step_label": "PLAN PENDIENTE APROBACION",
+  "status": "PLANNING",
+  "last_verified_commit": null,
+  "rollback_ref": null,
+  "artifacts_produced": [
+    ".claude/memory/PLAN_LEGALMOVE.md"
+  ],
+  "acceptance_criteria_met": [],
+  "plan_details": {
+    "strategy": "multi-dispatch-pro",
+    "flow": "feature",
+    "work_items": [
+      {
+        "id": "WI-01",
+        "name": "Scaffold + Modelos Base",
+        "steps": 4,
+        "status": "PENDING",
+        "phase": "BUILD",
+        "worktree": "A"
+      },
+      {
+        "id": "WI-02",
+        "name": "Agentes LangChain Colaborativos",
+        "steps": 4,
+        "status": "PENDING",
+        "phase": "BUILD",
+        "worktree": "B",
+        "depends_on": ["WI-01"]
+      },
+      {
+        "id": "WI-03",
+        "name": "Observabilidad Langfuse + Pipeline",
+        "steps": 4,
+        "status": "PENDING",
+        "phase": "INTEGRATE",
+        "worktree": null,
+        "depends_on": ["WI-01", "WI-02", "WI-04.step1"]
+      },
+      {
+        "id": "WI-04",
+        "name": "Assets + Documentación + Demo",
+        "steps": 4,
+        "status": "PENDING",
+        "phase": "BUILD+DOCUMENT",
+        "worktree": "C (step 1)",
+        "depends_on": ["WI-03"]
+      }
+    ],
+    "phases": ["PLAN", "BUILD", "INTEGRATE", "VERIFY", "DOCUMENT"]
+  },
+  "token_budget_used_pct": 0,
+  "token_budget_layers": {
+    "total_context_window": 200000,
+    "layers": {
+      "system": {
+        "name": "system",
+        "allocated_pct": 15,
+        "allocated_tokens": 30000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "skills": {
+        "name": "skills",
+        "allocated_pct": 15,
+        "allocated_tokens": 30000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "agents": {
+        "name": "agents",
+        "allocated_pct": 10,
+        "allocated_tokens": 20000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "conversation": {
+        "name": "conversation",
+        "allocated_pct": 40,
+        "allocated_tokens": 80000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      },
+      "tool_results": {
+        "name": "tool_results",
+        "allocated_pct": 20,
+        "allocated_tokens": 40000,
+        "used_tokens": 0,
+        "used_pct": 0,
+        "status": "GREEN"
+      }
+    },
+    "aggregate_used_pct": 0,
+    "aggregate_status": "GREEN",
+    "compact_threshold_pct": 60,
+    "checkpoint_threshold_pct": 85,
+    "strategy": "proactive"
+  },
+  "compact_applied": false,
+  "updated_at": "2026-05-21T23:30:00.000Z",
+  "history": [],
+  "fallback_state": {
+    "active": false,
+    "trigger": null,
+    "tool": null,
+    "model": null,
+    "triggered_at": null,
+    "returned_at": null,
+    "context_path": null
+  }
+}

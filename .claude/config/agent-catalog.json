@@ -1,0 +1,1624 @@
+{
+  "schema_version": "1.0",
+  "agents": [
+    {
+      "id": "workflow-orchestrator",
+      "displayName": "Workflow Orchestrator",
+      "role": "orchestrator",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "ORCHESTRATION"
+      ],
+      "canDispatch": [
+        "*"
+      ],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "multi-agent-coordinator",
+      "displayName": "Multi-Agent Coordinator",
+      "role": "orchestrator",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "ORCHESTRATION",
+        "HANDOFF"
+      ],
+      "canDispatch": [
+        "*"
+      ],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "context-manager",
+      "displayName": "Context Manager",
+      "role": "orchestrator",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "ORCHESTRATION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "planner",
+      "displayName": "Planner",
+      "role": "planner",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "implementation-plan",
+      "displayName": "Implementation Plan",
+      "role": "planner",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "code-architect",
+      "displayName": "Code Architect",
+      "role": "planner",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "architecture-modernizer",
+      "displayName": "Architecture Modernizer",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "principal-engineer",
+      "displayName": "Principal Engineer",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "adr-generator",
+      "displayName": "ADR Generator",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "tdd-green",
+      "displayName": "TDD Green",
+      "role": "implementer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "tdd-red",
+      "displayName": "TDD Red",
+      "role": "implementer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "refactoring-specialist",
+      "displayName": "Refactoring Specialist",
+      "role": "implementer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "typescript-pro",
+      "displayName": "TypeScript Pro",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "legacy-modernizer",
+      "displayName": "Legacy Modernizer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "code-reviewer",
+      "displayName": "Code Reviewer",
+      "role": "reviewer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_ACTION",
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "codebase-pattern-finder",
+      "displayName": "Codebase Pattern Finder",
+      "role": "reviewer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "compliance-auditor",
+      "displayName": "Compliance Auditor",
+      "role": "reviewer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_ACTION",
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "performance-profiler",
+      "displayName": "Performance Profiler",
+      "role": "reviewer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "technical-debt-manager",
+      "displayName": "Technical Debt Manager",
+      "role": "reviewer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "POST_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "api-documenter",
+      "displayName": "API Documenter",
+      "role": "reviewer",
+      "tier": 3,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "haiku",
+      "loopPhases": [
+        "POST_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "test-runner",
+      "displayName": "Test Runner",
+      "role": "verifier",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "PRE_VERIFY",
+        "POST_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "test-generator",
+      "displayName": "Test Generator",
+      "role": "verifier",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION",
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "commit-guardian",
+      "displayName": "Commit Guardian",
+      "role": "verifier",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_VERIFY",
+        "POST_VERIFY_FINAL"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "debugger",
+      "displayName": "Debugger",
+      "role": "verifier",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "backend-developer",
+      "displayName": "Backend Developer",
+      "role": "implementer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "backend-architect",
+      "displayName": "Backend Architect",
+      "role": "planner",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "frontend-engineer",
+      "displayName": "Frontend Engineer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "ui-developer",
+      "displayName": "UI Developer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "database-engineer",
+      "displayName": "Database Engineer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "database-administrator",
+      "displayName": "Database Administrator",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "devops-engineer",
+      "displayName": "DevOps Engineer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "iac-engineer",
+      "displayName": "IaC Engineer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "iac-strategist",
+      "displayName": "IaC Strategist",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "kubernetes-specialist",
+      "displayName": "Kubernetes Specialist",
+      "role": "implementer",
+      "tier": 3,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "platform-engineer",
+      "displayName": "Platform Engineer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "security-analyst",
+      "displayName": "Security Analyst",
+      "role": "reviewer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "java-architect",
+      "displayName": "Java Architect",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "spring-boot-engineer",
+      "displayName": "Spring Boot Engineer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "nextjs-architecture-expert",
+      "displayName": "Next.js Architecture Expert",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "GATHER_CONTEXT",
+        "PRE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "nextjs-developer",
+      "displayName": "Next.js Developer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "test-automator",
+      "displayName": "Test Automator",
+      "role": "verifier",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "penetration-tester",
+      "displayName": "Penetration Tester",
+      "role": "reviewer",
+      "tier": 3,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "sdd-spec-writer",
+      "displayName": "SDD Spec Writer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Grep",
+        "Glob"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "code-explorer",
+      "displayName": "Code Explorer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Glob",
+        "Grep",
+        "Read"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "ui-designer",
+      "displayName": "UI Designer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "accessibility-tester",
+      "displayName": "Accessibility Tester",
+      "role": "reviewer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "PRE_VERIFY"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "mcp-deployment-orchestrator",
+      "displayName": "MCP Deployment Orchestrator",
+      "role": "planner",
+      "tier": 3,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "ORCHESTRATION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "mcp-developer",
+      "displayName": "MCP Developer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "performance-monitor",
+      "displayName": "Performance Monitor",
+      "role": "reviewer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "task-distributor",
+      "displayName": "Task Distributor",
+      "role": "orchestrator",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "ORCHESTRATION"
+      ],
+      "canDispatch": [
+        "*"
+      ],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "error-coordinator",
+      "displayName": "Error Coordinator",
+      "role": "orchestrator",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "ORCHESTRATION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "context7",
+      "displayName": "Context7 Reference",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read"
+      ],
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "context7"
+      ]
+    },
+    {
+      "id": "git-flow-manager",
+      "displayName": "Git Flow Manager",
+      "role": "orchestrator",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "POST_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "microservices-architect",
+      "displayName": "Microservices Architect",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "GATHER_CONTEXT"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "initializer",
+      "displayName": "Initializer",
+      "role": "implementer",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "ORCHESTRATION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "sdk-config",
+      "displayName": "SDK Config Auditor",
+      "role": "verifier",
+      "tier": 1,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "ORCHESTRATION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "context-collector",
+      "displayName": "Context Collector",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "GATHER_CONTEXT"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem",
+        "git"
+      ]
+    },
+    {
+      "id": "ux-researcher",
+      "displayName": "UX Researcher",
+      "role": "planner",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "opus",
+      "loopPhases": [
+        "GATHER_CONTEXT"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    },
+    {
+      "id": "ui-ux-designer",
+      "displayName": "UI/UX Designer",
+      "role": "implementer",
+      "tier": 2,
+      "capabilities": [
+        "filesystem_read",
+        "filesystem_write",
+        "git_read",
+        "bash_execute"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "sonnet",
+      "loopPhases": [
+        "TAKE_ACTION"
+      ],
+      "canDispatch": [],
+      "requiredMcps": [
+        "filesystem"
+      ]
+    }
+  ]
+}
