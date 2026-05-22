@@ -7,28 +7,28 @@ Langfuse para trazabilidad jerárquica de spans:
     Trace padre: "contract_analysis"
       ├── Span: "image_parsing_original"
       ├── Span: "image_parsing_amendment"
-      ├── Span: "agent_contextualization"
-      ├── Span: "agent_extraction"
-      └── Span: "validation"
+      ├── Span: "agent_contextualization"  (creado internamente por pipeline.py)
+      ├── Span: "agent_extraction"         (creado internamente por pipeline.py)
+      └── Span: "validation"               (creado internamente por pipeline.py)
 
 Uso:
     python -m src.main original.png amendment.png [--model gpt-4o] [--output result.json]
 """
 
 import argparse
-import json
+import os
 import sys
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pydantic
 from dotenv import load_dotenv
 from langfuse import Langfuse
 
 from src.image_parser import parse_contract_image
-from src.agents.contextualization_agent import ContextualizationAgent
-from src.agents.extraction_agent import ExtractionAgent
-from src.models import ContractChangeOutput, ContractMetadata, FullAnalysisResult
+from src.agents.pipeline import ContractAnalysisPipeline
+from src.models import ContractMetadata, FullAnalysisResult
 
 
 # ---------------------------------------------------------------------------
@@ -44,7 +44,9 @@ def run_pipeline(
     """Execute the full contract analysis pipeline with Langfuse tracing.
 
     Creates a parent trace "contract_analysis" with 5 child spans that capture
-    inputs, outputs, and latency_ms for each pipeline stage.
+    inputs, outputs, and latency_ms for each pipeline stage. Image parsing spans
+    are managed here; agent orchestration spans are delegated to
+    ContractAnalysisPipeline.run() via the ``trace`` parameter.
 
     Parameters
     ----------
@@ -75,10 +77,8 @@ def run_pipeline(
 
     # Pre-validate image paths before initialising any external clients so that
     # missing-file errors surface with exit code 1 even when API keys are absent.
-    from pathlib import Path as _Path
-
     for label, img_path in (("original", original_path), ("amendment", amendment_path)):
-        p = _Path(img_path)
+        p = Path(img_path)
         if not p.exists():
             raise FileNotFoundError(f"Image file not found ({label}): {img_path!r}")
         if not p.is_file():
@@ -92,8 +92,8 @@ def run_pipeline(
     trace = langfuse.trace(
         name="contract_analysis",
         input={
-            "original_path": original_path,
-            "amendment_path": amendment_path,
+            "original_path": os.path.basename(original_path),
+            "amendment_path": os.path.basename(amendment_path),
             "model": model,
         },
     )
@@ -104,16 +104,16 @@ def run_pipeline(
         # ------------------------------------------------------------------
         span_parse_original = trace.span(
             name="image_parsing_original",
-            input={"image_path": original_path},
+            input={"image_path": os.path.basename(original_path)},
         )
         t0 = time.time()
-        original_text = parse_contract_image(original_path)
+        original_text = parse_contract_image(original_path, model=model)
         latency_ms_1 = round((time.time() - t0) * 1000, 2)
         span_parse_original.end(
             output={"text_length": len(original_text), "text_preview": original_text[:200]},
             metadata={
                 "latency_ms": latency_ms_1,
-                "image_path": original_path,
+                "image_path": os.path.basename(original_path),
                 "chars_extracted": len(original_text),
             },
         )
@@ -123,111 +123,37 @@ def run_pipeline(
         # ------------------------------------------------------------------
         span_parse_amendment = trace.span(
             name="image_parsing_amendment",
-            input={"image_path": amendment_path},
+            input={"image_path": os.path.basename(amendment_path)},
         )
         t0 = time.time()
-        amendment_text = parse_contract_image(amendment_path)
+        amendment_text = parse_contract_image(amendment_path, model=model)
         latency_ms_2 = round((time.time() - t0) * 1000, 2)
         span_parse_amendment.end(
             output={"text_length": len(amendment_text), "text_preview": amendment_text[:200]},
             metadata={
                 "latency_ms": latency_ms_2,
-                "image_path": amendment_path,
+                "image_path": os.path.basename(amendment_path),
                 "chars_extracted": len(amendment_text),
             },
         )
 
         # ------------------------------------------------------------------
-        # Span 3 — agent_contextualization
+        # Spans 3–5 — agent_contextualization, agent_extraction, validation
+        # Delegated to ContractAnalysisPipeline.run() which creates its own
+        # child spans when a trace is provided.
         # ------------------------------------------------------------------
-        contextualization_agent = ContextualizationAgent(
+        pipeline = ContractAnalysisPipeline(
             model_name=model,
             temperature=0.0,
         )
-        span_ctx = trace.span(
-            name="agent_contextualization",
-            input={
-                "original_text_length": len(original_text),
-                "amendment_text_length": len(amendment_text),
-                "original_preview": original_text[:300],
-                "amendment_preview": amendment_text[:300],
-            },
-        )
-        t0 = time.time()
-        semantic_map: str = contextualization_agent.analyze(
+        validated_output = pipeline.run(
             original_text=original_text,
             amendment_text=amendment_text,
-        )
-        latency_ms_3 = round((time.time() - t0) * 1000, 2)
-        span_ctx.end(
-            output={
-                "semantic_map_length": len(semantic_map),
-                "semantic_map_preview": semantic_map[:400],
-            },
-            metadata={
-                "latency_ms": latency_ms_3,
-                "model": model,
-                "agent": "ContextualizationAgent",
-            },
+            trace=trace,
         )
 
-        # ------------------------------------------------------------------
-        # Span 4 — agent_extraction
-        # ------------------------------------------------------------------
-        extraction_agent = ExtractionAgent(
-            model_name=model,
-            temperature=0.0,
-        )
-        span_ext = trace.span(
-            name="agent_extraction",
-            input={
-                "original_text_length": len(original_text),
-                "amendment_text_length": len(amendment_text),
-                "semantic_map_length": len(semantic_map),
-                "semantic_map_preview": semantic_map[:400],
-            },
-        )
-        t0 = time.time()
-        raw_result: dict = extraction_agent.extract(
-            original_text=original_text,
-            amendment_text=amendment_text,
-            semantic_map=semantic_map,
-        )
-        latency_ms_4 = round((time.time() - t0) * 1000, 2)
-        span_ext.end(
-            output={
-                "result_keys": list(raw_result.keys()),
-                "modified_clauses_count": len(raw_result.get("modified_clauses", [])),
-                "result_preview": json.dumps(raw_result)[:400],
-            },
-            metadata={
-                "latency_ms": latency_ms_4,
-                "model": model,
-                "agent": "ExtractionAgent",
-            },
-        )
-
-        # ------------------------------------------------------------------
-        # Span 5 — validation
-        # ------------------------------------------------------------------
-        span_val = trace.span(
-            name="validation",
-            input={"raw_result": raw_result},
-        )
-        t0 = time.time()
-        validated_output = ContractChangeOutput.model_validate(raw_result)
-        latency_ms_5 = round((time.time() - t0) * 1000, 2)
-        span_val.end(
-            output={
-                "total_changes": len(validated_output.modified_clauses),
-                "summary_preview": validated_output.summary_of_changes[:200],
-            },
-            metadata={
-                "latency_ms": latency_ms_5,
-                "schema": "ContractChangeOutput",
-                "validation": "pydantic_v2",
-            },
-        )
+        # Aggregate latency from pipeline spans (spans 3–5 are created inside pipeline)
+        latency_ms_1_2 = latency_ms_1 + latency_ms_2
 
         # ------------------------------------------------------------------
         # Build FullAnalysisResult with traceability metadata
@@ -252,14 +178,7 @@ def run_pipeline(
                 "processing_date": processing_date,
                 "model_used": model,
                 "summary": validated_output.summary_of_changes,
-                "latency_breakdown_ms": {
-                    "image_parsing_original": latency_ms_1,
-                    "image_parsing_amendment": latency_ms_2,
-                    "agent_contextualization": latency_ms_3,
-                    "agent_extraction": latency_ms_4,
-                    "validation": latency_ms_5,
-                    "total": round(latency_ms_1 + latency_ms_2 + latency_ms_3 + latency_ms_4 + latency_ms_5, 2),
-                },
+                "latency_image_parsing_ms": round(latency_ms_1_2, 2),
             }
         )
 

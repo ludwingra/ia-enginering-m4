@@ -28,3 +28,7 @@ Thumbs.db
 # Cache
 data/.cache/
 *.log
+
+# ASD SDK (local only)
+.claude/
+.mcp.json
