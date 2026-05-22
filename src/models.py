@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
 class ClauseChange(BaseModel):
@@ -30,8 +30,6 @@ class ClauseChange(BaseModel):
 
 class ContractChangeOutput(BaseModel):
     """Modelo principal de salida del análisis de cambios contractuales. Contiene los 3 campos obligatorios del resultado."""
-
-    model_config = ConfigDict(strict=True)
 
     summary_of_changes: str = Field(
         description="Resumen ejecutivo de todos los cambios detectados entre el contrato original y la adenda"

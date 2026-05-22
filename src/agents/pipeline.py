@@ -12,15 +12,25 @@ Orquesta el flujo completo de análisis contractual entre los dos agentes:
 El semantic_map producido por el Analista Legal Senior (Agent 1) se pasa
 explícitamente al Auditor Legal (Agent 2) como contexto enriquecido, siguiendo
 el contrato de handoff definido en la arquitectura del sistema.
+
+Cuando se provee un ``trace`` de Langfuse al método ``run()``, el pipeline
+crea internamente child spans para cada paso, manteniendo la jerarquía de
+trazabilidad sin exponer lógica de instrumentación al caller.
 """
 
+import json
 import logging
+import time
+from typing import TYPE_CHECKING, Any
 
 from pydantic import ValidationError
 
 from src.agents.contextualization_agent import ContextualizationAgent
 from src.agents.extraction_agent import ExtractionAgent
 from src.models import ContractChangeOutput
+
+if TYPE_CHECKING:
+    pass  # Langfuse trace type — imported lazily to avoid hard dependency at module level
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +65,7 @@ class ContractAnalysisPipeline:
             api_key: API key de OpenAI. Si se omite, se usa la variable de entorno
                      OPENAI_API_KEY.
         """
+        self._model_name = model_name
         self._contextualization_agent = ContextualizationAgent(
             model_name=model_name,
             temperature=temperature,
@@ -70,6 +81,7 @@ class ContractAnalysisPipeline:
         self,
         original_text: str,
         amendment_text: str,
+        trace: Any = None,
     ) -> ContractChangeOutput:
         """
         Ejecuta el pipeline completo y retorna el output validado con Pydantic.
@@ -83,6 +95,9 @@ class ContractAnalysisPipeline:
         Args:
             original_text: Texto completo del contrato original.
             amendment_text: Texto completo de la adenda o enmienda contractual.
+            trace: Objeto trace de Langfuse (opcional). Cuando se provee, el pipeline
+                   crea child spans para cada paso con input, output y latency_ms.
+                   Cuando es None el pipeline corre sin instrumentación (backward compatible).
 
         Returns:
             ContractChangeOutput validado con todos los cambios detectados.
@@ -93,27 +108,121 @@ class ContractAnalysisPipeline:
                              mensaje descriptivo que incluye los errores de validación.
             ValueError: Si ExtractionAgent no puede extraer un JSON válido del LLM.
         """
+        # ------------------------------------------------------------------
         # Paso 1: ContextualizationAgent genera el mapa semántico
+        # ------------------------------------------------------------------
         logger.info("Paso 1/3 — ContextualizationAgent: generando mapa semántico...")
-        semantic_map: str = self._contextualization_agent.analyze(
-            original_text=original_text,
-            amendment_text=amendment_text,
-        )
+
+        span_ctx = None
+        if trace is not None:
+            span_ctx = trace.span(
+                name="agent_contextualization",
+                input={
+                    "original_text_length": len(original_text),
+                    "amendment_text_length": len(amendment_text),
+                    "original_preview": original_text[:300],
+                    "amendment_preview": amendment_text[:300],
+                },
+            )
+
+        t0 = time.time()
+        try:
+            semantic_map: str = self._contextualization_agent.analyze(
+                original_text=original_text,
+                amendment_text=amendment_text,
+            )
+        except Exception as exc:
+            if span_ctx is not None:
+                span_ctx.end(
+                    output={"error": str(exc)},
+                    metadata={"status": "ERROR", "error_type": type(exc).__name__},
+                    level="ERROR",
+                )
+            raise
+        latency_ms_ctx = round((time.time() - t0) * 1000, 2)
         logger.debug("Mapa semántico generado (%d chars).", len(semantic_map))
 
-        # Paso 2: ExtractionAgent recibe el mapa semántico como handoff (contrato de paso)
+        if span_ctx is not None:
+            span_ctx.end(
+                output={
+                    "semantic_map_length": len(semantic_map),
+                    "semantic_map_preview": semantic_map[:400],
+                },
+                metadata={
+                    "latency_ms": latency_ms_ctx,
+                    "model": self._model_name,
+                    "agent": "ContextualizationAgent",
+                    "estimated_input_tokens": (len(original_text) + len(amendment_text)) // 4,
+                    "estimated_output_tokens": len(semantic_map) // 4,
+                },
+            )
+
+        # ------------------------------------------------------------------
+        # Paso 2: ExtractionAgent recibe el mapa semántico como handoff
+        # ------------------------------------------------------------------
         logger.info(
             "Paso 2/3 — ExtractionAgent: extrayendo cambios usando el mapa semántico..."
         )
-        result: dict = self._extraction_agent.extract(
-            original_text=original_text,
-            amendment_text=amendment_text,
-            semantic_map=semantic_map,  # HANDOFF explícito: output de Agent 1 → input de Agent 2
-        )
+
+        span_ext = None
+        if trace is not None:
+            span_ext = trace.span(
+                name="agent_extraction",
+                input={
+                    "original_text_length": len(original_text),
+                    "amendment_text_length": len(amendment_text),
+                    "semantic_map_length": len(semantic_map),
+                    "semantic_map_preview": semantic_map[:400],
+                },
+            )
+
+        t0 = time.time()
+        try:
+            result: dict = self._extraction_agent.extract(
+                original_text=original_text,
+                amendment_text=amendment_text,
+                semantic_map=semantic_map,  # HANDOFF explícito: output de Agent 1 → input de Agent 2
+            )
+        except Exception as exc:
+            if span_ext is not None:
+                span_ext.end(
+                    output={"error": str(exc)},
+                    metadata={"status": "ERROR", "error_type": type(exc).__name__},
+                    level="ERROR",
+                )
+            raise
+        latency_ms_ext = round((time.time() - t0) * 1000, 2)
         logger.debug("Dict de extracción obtenido con claves: %s.", list(result.keys()))
 
+        if span_ext is not None:
+            span_ext.end(
+                output={
+                    "result_keys": list(result.keys()),
+                    "modified_clauses_count": len(result.get("modified_clauses", [])),
+                    "result_preview": json.dumps(result)[:400],
+                },
+                metadata={
+                    "latency_ms": latency_ms_ext,
+                    "model": self._model_name,
+                    "agent": "ExtractionAgent",
+                    "estimated_input_tokens": (len(original_text) + len(amendment_text) + len(semantic_map)) // 4,
+                    "estimated_output_tokens": len(json.dumps(result)) // 4,
+                },
+            )
+
+        # ------------------------------------------------------------------
         # Paso 3: Validar el dict con Pydantic
+        # ------------------------------------------------------------------
         logger.info("Paso 3/3 — Validando output con ContractChangeOutput...")
+
+        span_val = None
+        if trace is not None:
+            span_val = trace.span(
+                name="validation",
+                input={"raw_result": result},
+            )
+
+        t0 = time.time()
         try:
             validated_output = ContractChangeOutput.model_validate(result)
         except ValidationError as exc:
@@ -125,10 +234,32 @@ class ContractAnalysisPipeline:
                 error_detail,
                 result,
             )
+            if span_val is not None:
+                span_val.end(
+                    output={"error": error_detail},
+                    metadata={"status": "ERROR", "error_type": "ValidationError"},
+                    level="ERROR",
+                )
             raise ValidationError(
                 exc.errors(),
                 model=ContractChangeOutput,
             ) from exc
+        latency_ms_val = round((time.time() - t0) * 1000, 2)
+
+        if span_val is not None:
+            span_val.end(
+                output={
+                    "total_changes": len(validated_output.modified_clauses),
+                    "summary_preview": validated_output.summary_of_changes[:200],
+                },
+                metadata={
+                    "latency_ms": latency_ms_val,
+                    "schema": "ContractChangeOutput",
+                    "validation": "pydantic_v2",
+                    "estimated_input_tokens": len(json.dumps(result)) // 4,
+                    "estimated_output_tokens": len(validated_output.summary_of_changes) // 4,
+                },
+            )
 
         logger.info(
             "Pipeline completado exitosamente. Cambios detectados: %d.",

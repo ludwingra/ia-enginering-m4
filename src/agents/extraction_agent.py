@@ -96,14 +96,17 @@ Debes retornar EXACTAMENTE un objeto JSON con la siguiente estructura:
   (comillas, saltos de línea, etc.)."""
 
 HUMAN_TEMPLATE = """\
-## MAPA SEMÁNTICO (del Analista Legal Senior)
+<mapa_semantico>
 {semantic_map}
+</mapa_semantico>
 
-## CONTRATO ORIGINAL
+<contrato_original>
 {original_text}
+</contrato_original>
 
-## ADENDA / ENMIENDA
+<adenda>
 {amendment_text}
+</adenda>
 
 Genera el JSON de análisis de cambios siguiendo estrictamente el schema indicado."""
 

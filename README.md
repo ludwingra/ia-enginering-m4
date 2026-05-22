@@ -50,7 +50,7 @@ flowchart TD
 | **Python** | 3.11+ | Tipado estático con `TypeAlias` y `type union` (`X \| Y`), `match` statements y mejor rendimiento en el intérprete. |
 | **OpenAI GPT-4o Vision** | API v1 | Capacidad multimodal nativa: procesa imágenes directamente sin OCR previo. Superior en documentos legales con tablas, firmas y formatos complejos donde el OCR tradicional pierde contexto semántico. |
 | **LangChain** | >=0.2.0 | Orquestación de agentes con chains tipadas (`prompt \| llm \| parser`). Permite composición declarativa del flujo de cada agente y reemplazo de componentes sin cambiar la lógica de negocio. |
-| **Pydantic v2** | >=2.7.0 | Validación estricta de schemas con `ConfigDict(strict=True)`. `model_validate()` convierte el dict crudo del LLM en un objeto tipado, rechazando outputs malformados antes de que lleguen al usuario. |
+| **Pydantic v2** | >=2.7.0 | Validación de schemas con `model_validate()`. Convierte el dict crudo del LLM en un objeto tipado, rechazando outputs malformados antes de que lleguen al usuario. Permite coerción segura de tipos para tolerar variaciones del LLM. |
 | **Langfuse** | >=2.36.0 | Observabilidad nativa del pipeline con spans jerárquicos. Permite auditar cada llamada al LLM, medir latencia por etapa y rastrear trazas completas por análisis. Esencial para debugging en producción y cumplimiento de auditoría legal. |
 | **python-dotenv** | >=1.0.0 | Gestión segura de secrets: las API keys nunca se hardcodean en el código fuente. Carga automática desde `.env` sin configuración adicional. |
 
@@ -280,7 +280,7 @@ ContractChangeOutput.model_validate(raw_result)
 | `change_type` | `Literal` | `"added"` / `"modified"` / `"removed"` | Tipo de cambio aplicado. |
 | `significance` | `Literal` | `"high"` / `"medium"` / `"low"` | Nivel de impacto legal y económico. |
 
-**Nota:** `ContractChangeOutput` usa `ConfigDict(strict=True)` — Pydantic rechaza tipos incorrectos sin coerción silenciosa.
+**Nota:** `ContractChangeOutput` permite coerción segura de tipos de Pydantic v2, tolerando variaciones menores del LLM (ej: int donde se espera str) sin comprometer la integridad del schema.
 
 ---
 
@@ -301,11 +301,11 @@ Trace: contract_analysis
 
 | Span | Input registrado | Output registrado | Metadata |
 |---|---|---|---|
-| `image_parsing_original` | `image_path` | `text_length`, `text_preview` | `chars_extracted`, `latency_ms` |
-| `image_parsing_amendment` | `image_path` | `text_length`, `text_preview` | `chars_extracted`, `latency_ms` |
-| `agent_contextualization` | previews de ambos textos | `semantic_map_length`, preview | `model`, `agent`, `latency_ms` |
-| `agent_extraction` | longitudes + preview del mapa | `result_keys`, `modified_clauses_count` | `model`, `agent`, `latency_ms` |
-| `validation` | `raw_result` | `total_changes`, `summary_preview` | `schema`, `validation`, `latency_ms` |
+| `image_parsing_original` | `image_path` (basename) | `text_length`, `text_preview` | `chars_extracted`, `latency_ms` |
+| `image_parsing_amendment` | `image_path` (basename) | `text_length`, `text_preview` | `chars_extracted`, `latency_ms` |
+| `agent_contextualization` | previews de ambos textos | `semantic_map_length`, preview | `model`, `agent`, `latency_ms`, `estimated_input_tokens`, `estimated_output_tokens` |
+| `agent_extraction` | longitudes + preview del mapa | `result_keys`, `modified_clauses_count` | `model`, `agent`, `latency_ms`, `estimated_input_tokens`, `estimated_output_tokens` |
+| `validation` | `raw_result` | `total_changes`, `summary_preview` | `schema`, `validation`, `latency_ms`, `estimated_input_tokens`, `estimated_output_tokens` |
 
 La traza padre acumula además el **desglose total de latencia** en ms por etapa para identificar cuellos de botella.
 
@@ -319,9 +319,9 @@ La traza padre acumula además el **desglose total de latencia** en ms por etapa
 
 Los contratos legales tienen formatos complejos: tablas de penalidades, numeraciones jerárquicas anidadas, texto en múltiples columnas, marcas de agua, firmas y sellos. El OCR tradicional (Tesseract, AWS Textract) extrae caracteres pero pierde la **semántica estructural**: no sabe que "3.1.a)" es una sub-cláusula de "3.1" que pertenece a la sección "3. Obligaciones". GPT-4o Vision entiende el layout visual directamente y produce Markdown con jerarquía correcta, lo que permite al pipeline comparar cláusulas por su posición estructural, no solo por texto literal.
 
-### Por qué Pydantic strict mode
+### Por qué Pydantic sin strict mode
 
-`ConfigDict(strict=True)` desactiva la coerción de tipos de Pydantic. Sin esto, un LLM que devuelva `"3"` (string) en lugar de `3` (int) pasaría validación silenciosamente. En un sistema de análisis legal donde la precisión es crítica, cualquier tipo incorrecto debe fallar explícitamente con un error descriptivo que permita depuración inmediata, no silenciarse.
+Se optó por no usar `ConfigDict(strict=True)` para tolerar variaciones menores del LLM (ej: un `clause_id` devuelto como int en vez de str). Pydantic v2 sin strict mode sigue validando la estructura y los tipos, pero permite coerción segura — convirtiendo `3` a `"3"` automáticamente. Esto mejora la robustez del pipeline sin comprometer la integridad del schema, ya que los tipos base (`Literal`, `str`, `list`) siguen siendo validados estrictamente.
 
 ### Por qué Langfuse y no logging simple
 
@@ -332,6 +332,10 @@ El logging a archivo (`logger.info(...)`) registra eventos linealmente pero no c
 - Trazabilidad por `trace_id` para reproducir cualquier análisis específico.
 
 Para un pipeline de auditoría legal esto no es opcional: cada análisis debe ser reproducible y auditable.
+
+### Seguridad anti-injection en prompts
+
+Los textos extraídos de las imágenes de contratos se delimitan con tags XML (`<contrato_original>`, `<adenda>`, `<mapa_semantico>`) en los prompts de ambos agentes. Esto crea una separación clara entre las instrucciones del sistema y los datos del usuario, mitigando el riesgo de prompt injection si un contrato contiene texto adversarial. Los paths de archivos se envían a Langfuse como `basename` (sin la ruta completa del sistema).
 
 ### Por qué handoff explícito entre agentes
 
