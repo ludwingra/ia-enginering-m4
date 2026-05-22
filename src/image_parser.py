@@ -10,7 +10,6 @@ import time
 from pathlib import Path
 
 import openai
-from dotenv import load_dotenv
 
 # ---------------------------------------------------------------------------
 # Supported image extensions and their MIME types
@@ -33,7 +32,6 @@ def _get_client() -> openai.OpenAI:
     """Return the module-level OpenAI client, initialising it on first call."""
     global _client
     if _client is None:
-        load_dotenv()
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             raise EnvironmentError(
