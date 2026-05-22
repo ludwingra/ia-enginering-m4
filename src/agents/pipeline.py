@@ -126,10 +126,19 @@ class ContractAnalysisPipeline:
             )
 
         t0 = time.time()
-        semantic_map: str = self._contextualization_agent.analyze(
-            original_text=original_text,
-            amendment_text=amendment_text,
-        )
+        try:
+            semantic_map: str = self._contextualization_agent.analyze(
+                original_text=original_text,
+                amendment_text=amendment_text,
+            )
+        except Exception as exc:
+            if span_ctx is not None:
+                span_ctx.end(
+                    output={"error": str(exc)},
+                    metadata={"status": "ERROR", "error_type": type(exc).__name__},
+                    level="ERROR",
+                )
+            raise
         latency_ms_ctx = round((time.time() - t0) * 1000, 2)
         logger.debug("Mapa semántico generado (%d chars).", len(semantic_map))
 
@@ -143,6 +152,8 @@ class ContractAnalysisPipeline:
                     "latency_ms": latency_ms_ctx,
                     "model": self._model_name,
                     "agent": "ContextualizationAgent",
+                    "estimated_input_tokens": (len(original_text) + len(amendment_text)) // 4,
+                    "estimated_output_tokens": len(semantic_map) // 4,
                 },
             )
 
@@ -166,11 +177,20 @@ class ContractAnalysisPipeline:
             )
 
         t0 = time.time()
-        result: dict = self._extraction_agent.extract(
-            original_text=original_text,
-            amendment_text=amendment_text,
-            semantic_map=semantic_map,  # HANDOFF explícito: output de Agent 1 → input de Agent 2
-        )
+        try:
+            result: dict = self._extraction_agent.extract(
+                original_text=original_text,
+                amendment_text=amendment_text,
+                semantic_map=semantic_map,  # HANDOFF explícito: output de Agent 1 → input de Agent 2
+            )
+        except Exception as exc:
+            if span_ext is not None:
+                span_ext.end(
+                    output={"error": str(exc)},
+                    metadata={"status": "ERROR", "error_type": type(exc).__name__},
+                    level="ERROR",
+                )
+            raise
         latency_ms_ext = round((time.time() - t0) * 1000, 2)
         logger.debug("Dict de extracción obtenido con claves: %s.", list(result.keys()))
 
@@ -185,6 +205,8 @@ class ContractAnalysisPipeline:
                     "latency_ms": latency_ms_ext,
                     "model": self._model_name,
                     "agent": "ExtractionAgent",
+                    "estimated_input_tokens": (len(original_text) + len(amendment_text) + len(semantic_map)) // 4,
+                    "estimated_output_tokens": len(json.dumps(result)) // 4,
                 },
             )
 
@@ -212,6 +234,12 @@ class ContractAnalysisPipeline:
                 error_detail,
                 result,
             )
+            if span_val is not None:
+                span_val.end(
+                    output={"error": error_detail},
+                    metadata={"status": "ERROR", "error_type": "ValidationError"},
+                    level="ERROR",
+                )
             raise ValidationError(
                 exc.errors(),
                 model=ContractChangeOutput,
@@ -228,6 +256,8 @@ class ContractAnalysisPipeline:
                     "latency_ms": latency_ms_val,
                     "schema": "ContractChangeOutput",
                     "validation": "pydantic_v2",
+                    "estimated_input_tokens": len(json.dumps(result)) // 4,
+                    "estimated_output_tokens": len(validated_output.summary_of_changes) // 4,
                 },
             )
 

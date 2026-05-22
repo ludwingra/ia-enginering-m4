@@ -4,12 +4,14 @@ Parses legal contract images using GPT-4o Vision API.
 """
 
 import base64
+import logging
 import os
-import sys
 import time
 from pathlib import Path
 
 import openai
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Supported image extensions and their MIME types
@@ -257,10 +259,7 @@ def parse_contract_image(image_path: str, model: str = "gpt-4o") -> str:
 
         except openai.APIError as exc:
             # Non-retryable API errors: log and re-raise immediately
-            print(
-                f"[image_parser] OpenAI APIError (attempt {attempt}): {exc}",
-                file=sys.stderr,
-            )
+            logger.error("OpenAI APIError (attempt %d): %s", attempt, exc)
             raise openai.APIError(
                 f"OpenAI API error while parsing {image_path!r}: {exc}",
                 request=exc.request,  # type: ignore[arg-type]
@@ -270,9 +269,8 @@ def parse_contract_image(image_path: str, model: str = "gpt-4o") -> str:
         # Wait before the next retry (no sleep after the last attempt)
         if attempt < _MAX_RETRIES:
             wait = _BACKOFF_SECONDS[attempt - 1]
-            print(
-                f"[image_parser] Retrying in {wait}s... (attempt {attempt}/{_MAX_RETRIES})",
-                file=sys.stderr,
+            logger.warning(
+                "Retrying in %ds... (attempt %d/%d)", wait, attempt, _MAX_RETRIES
             )
             time.sleep(wait)
 
@@ -291,8 +289,5 @@ def parse_contract_image(image_path: str, model: str = "gpt-4o") -> str:
 
 
 def _log_retry(attempt: int, error_type: str, exc: Exception) -> None:
-    """Write a retry warning to stderr."""
-    print(
-        f"[image_parser] {error_type} on attempt {attempt}/{_MAX_RETRIES}: {exc}",
-        file=sys.stderr,
-    )
+    """Write a retry warning to the logger."""
+    logger.warning("%s on attempt %d/%d: %s", error_type, attempt, _MAX_RETRIES, exc)

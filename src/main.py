@@ -16,6 +16,7 @@ Uso:
 """
 
 import argparse
+import os
 import sys
 import time
 from datetime import datetime, timezone
@@ -91,8 +92,8 @@ def run_pipeline(
     trace = langfuse.trace(
         name="contract_analysis",
         input={
-            "original_path": original_path,
-            "amendment_path": amendment_path,
+            "original_path": os.path.basename(original_path),
+            "amendment_path": os.path.basename(amendment_path),
             "model": model,
         },
     )
@@ -103,7 +104,7 @@ def run_pipeline(
         # ------------------------------------------------------------------
         span_parse_original = trace.span(
             name="image_parsing_original",
-            input={"image_path": original_path},
+            input={"image_path": os.path.basename(original_path)},
         )
         t0 = time.time()
         original_text = parse_contract_image(original_path, model=model)
@@ -112,7 +113,7 @@ def run_pipeline(
             output={"text_length": len(original_text), "text_preview": original_text[:200]},
             metadata={
                 "latency_ms": latency_ms_1,
-                "image_path": original_path,
+                "image_path": os.path.basename(original_path),
                 "chars_extracted": len(original_text),
             },
         )
@@ -122,7 +123,7 @@ def run_pipeline(
         # ------------------------------------------------------------------
         span_parse_amendment = trace.span(
             name="image_parsing_amendment",
-            input={"image_path": amendment_path},
+            input={"image_path": os.path.basename(amendment_path)},
         )
         t0 = time.time()
         amendment_text = parse_contract_image(amendment_path, model=model)
@@ -131,7 +132,7 @@ def run_pipeline(
             output={"text_length": len(amendment_text), "text_preview": amendment_text[:200]},
             metadata={
                 "latency_ms": latency_ms_2,
-                "image_path": amendment_path,
+                "image_path": os.path.basename(amendment_path),
                 "chars_extracted": len(amendment_text),
             },
         )
