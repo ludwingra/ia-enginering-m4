@@ -60,11 +60,13 @@ explícitamente en los documentos, y distingue claramente entre el texto del \
 contrato original y el de la adenda."""
 
 HUMAN_TEMPLATE = """\
-## CONTRATO ORIGINAL
+<contrato_original>
 {original_text}
+</contrato_original>
 
-## ADENDA / ENMIENDA
+<adenda>
 {amendment_text}
+</adenda>
 
 Por favor, genera el mapa semántico comparativo siguiendo tus instrucciones."""
 

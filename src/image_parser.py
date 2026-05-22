@@ -57,6 +57,11 @@ INSTRUCCIONES CRÍTICAS:
 - NO omitas ni resumas ningún texto — extrae TODO el contenido
 - Si hay tablas, represéntalas en formato Markdown
 - Si hay firmas o sellos, indícalos como [FIRMA] o [SELLO]
+- Identifica y preserva el tipo de documento: contrato, adenda, enmienda, anexo
+- Registra las partes involucradas si aparecen en el encabezado
+- Presta especial atención a: montos, fechas, plazos, porcentajes y condiciones
+- Si hay texto parcialmente legible, indica con [ILEGIBLE] en vez de adivinar
+- Preserva la numeración exacta de cada cláusula y sub-cláusula
 """
 
 # ---------------------------------------------------------------------------
@@ -167,7 +172,7 @@ _MAX_RETRIES = 3
 _BACKOFF_SECONDS = [1, 2, 4]  # exponential backoff: 1 s, 2 s, 4 s
 
 
-def parse_contract_image(image_path: str) -> str:
+def parse_contract_image(image_path: str, model: str = "gpt-4o") -> str:
     """Extract text from a legal-contract image using GPT-4o Vision.
 
     The extracted text preserves the hierarchical structure of the document
@@ -178,6 +183,8 @@ def parse_contract_image(image_path: str) -> str:
     ----------
     image_path:
         Filesystem path to the contract image.
+    model:
+        OpenAI model identifier to use for the Vision API call (default: "gpt-4o").
 
     Returns
     -------
@@ -233,9 +240,9 @@ def parse_contract_image(image_path: str) -> str:
     for attempt in range(1, _MAX_RETRIES + 1):
         try:
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model=model,
                 messages=messages,  # type: ignore[arg-type]
-                max_tokens=4096,
+                max_tokens=8192,
             )
             extracted_text: str = response.choices[0].message.content or ""
             return extracted_text

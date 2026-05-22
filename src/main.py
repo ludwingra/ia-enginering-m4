@@ -106,7 +106,7 @@ def run_pipeline(
             input={"image_path": original_path},
         )
         t0 = time.time()
-        original_text = parse_contract_image(original_path)
+        original_text = parse_contract_image(original_path, model=model)
         latency_ms_1 = round((time.time() - t0) * 1000, 2)
         span_parse_original.end(
             output={"text_length": len(original_text), "text_preview": original_text[:200]},
@@ -125,7 +125,7 @@ def run_pipeline(
             input={"image_path": amendment_path},
         )
         t0 = time.time()
-        amendment_text = parse_contract_image(amendment_path)
+        amendment_text = parse_contract_image(amendment_path, model=model)
         latency_ms_2 = round((time.time() - t0) * 1000, 2)
         span_parse_amendment.end(
             output={"text_length": len(amendment_text), "text_preview": amendment_text[:200]},
